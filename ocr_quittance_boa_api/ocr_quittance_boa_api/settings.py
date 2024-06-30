@@ -28,7 +28,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = [
     'ocrquittanceapi1-f17rbnap.b4a.run',
-    'https://ocr-quittance-api.vercel.app'
+    'ocr-quittance-api.vercel.app'
     'localhost',
     '127.0.0.1',
     '[::1]',
