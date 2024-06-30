@@ -4,7 +4,7 @@ import json
 import re
 from django.conf import settings
 import fitz  # PyMuPDF
-from PIL import Image
+from PIL import Image,ImageOps
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -33,6 +33,8 @@ class ProcessPDFView(APIView):
                         page = doc.load_page(page_num)
                         pix = page.get_pixmap()
                         img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                        if img.width > img.height:
+                            img = ImageOps.exif_transpose(img.rotate(90, expand=True))
                         images.append(img)
 
                     # Supposons que nous traitons uniquement la première page pour cet exemple
@@ -70,6 +72,28 @@ class ProcessPDFView(APIView):
                             "payment_reason": ""
                         }
                     """
+            prompt="""Veuillez analyser l'image de la quittance jointe et extraire les informations suivantes :
+                        1. Amount : Le montant initial de l'opération, excluant les frais de timbre.
+                        2. Student Name : Le nom de l'étudiant associé à la quittance.
+                        3. Stamp Fees : Les frais de timbre inclus dans la quittance. Ils sont toujours situés après le montant et ne peuvent jamais être égaux au montant. Laissez ce champ vide si les frais de timbre ne sont pas mentionnés.
+                        4. Currency : La devise dans laquelle le montant de la quittance est spécifié.
+                        5. Date : La date mentionnée sur la quittance.
+                        6. Reference : Le numéro de référence sur la quittance.
+                        7. Payment Reason : Le motif du paiement mentionné sur la quittance (situé après ou en dessous du nom de l'étudiant).
+
+                        Retournez les informations extraites au format JSON pur sans aucun formatage ou commentaire supplémentaire. Assurez-vous que la sortie soit un JSON valide pour éviter toute erreur de parsing.
+
+                        Si les informations ne peuvent pas être trouvées dans l'image, veuillez retourner le JSON avec des attributs vides comme indiqué ci-dessous :
+                        {
+                            "amount": "",
+                            "student_name": "",
+                            "stamp_fees": "",
+                            "currency": "",
+                            "date": "",
+                            "reference": "",
+                            "payment_reason": ""
+                        }
+                        """
             response = model.generate_content([prompt, img])
             try:
                 cleaned_response = re.sub(r'```json|```', '', response.text).strip()
