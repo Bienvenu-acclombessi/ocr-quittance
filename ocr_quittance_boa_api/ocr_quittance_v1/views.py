@@ -1,0 +1,91 @@
+# myapp/views.py
+
+import json
+import re
+from django.conf import settings
+import fitz  # PyMuPDF
+from PIL import Image
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
+from .serializers import PDFUploadSerializer
+import google.generativeai as genai
+from django.core.files.uploadedfile import InMemoryUploadedFile
+
+
+genai.configure(api_key=settings.GOOGLE_GENAI_API_KEY)
+class ProcessPDFView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = PDFUploadSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            uploaded_file = serializer.validated_data['file']
+            
+            # verfification
+            # Vérifiez le type de fichier
+            if isinstance(uploaded_file, InMemoryUploadedFile):
+                if uploaded_file.content_type == 'application/pdf':
+                    # Traitez le fichier PDF
+                    pdf_file = uploaded_file
+                    doc = fitz.open(stream=pdf_file.read(), filetype="pdf")
+                    images = []
+                    for page_num in range(len(doc)):
+                        page = doc.load_page(page_num)
+                        pix = page.get_pixmap()
+                        img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                        images.append(img)
+
+                    # Supposons que nous traitons uniquement la première page pour cet exemple
+                    img_path = 'page.png'
+                    images[0].save(img_path)
+                    img=Image.open('page.png')
+                elif uploaded_file.content_type.startswith('image/'):
+                    # Traitez le fichier image
+                    img = Image.open(uploaded_file)
+                else:
+                    return Response({"error": "Unsupported file type"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Supposons que nous traitons uniquement la première page pour cet exemple
+            
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            prompt = """Please analyze the attached image of an invoice and extract the following information:
+                        1. Amount: The initial amount of the operation, excluding the stamp fees.
+                        2. Student Name: The name of the student associated with the invoice.
+                        3. Stamp Fees: The stamp fees included in the invoice. it's always located after the amount and can never equal to amount. Set it to empty string if The stamp fees is not found.
+                        4. Currency: The currency in which the invoice amount is specified.
+                        5. Date: The date mentioned on the invoice.
+                        6. Reference: The reference number on the invoice.
+                        7. Payment Reason: The reason for the payment mentioned on the invoice (located after or below the student's name).
+
+                        Return the extracted information in pure JSON format without any additional formatting or comments. Ensure the output is valid JSON to avoid any parsing errors.
+
+                        If the information cannot be found in the image, please return the JSON with empty attributes as shown below:
+                        {
+                            "amount": "",
+                            "student_name": "",
+                            "stamp_fees": "",
+                            "currency": "",
+                            "date": "",
+                            "reference": "",
+                            "payment_reason": ""
+                        }
+                    """
+            response = model.generate_content([prompt, img])
+            try:
+                cleaned_response = re.sub(r'```json|```', '', response.text).strip()
+                extracted_data = json.loads(cleaned_response)
+                response_json = {
+                    "amount": extracted_data.get("amount", ""),
+                    "student_name": extracted_data.get("student_name", ""),
+                    "stamp_fees": extracted_data.get("stamp_fees", ""),
+                    "currency": extracted_data.get("currency", ""),
+                    "date": extracted_data.get("date", ""),
+                    "reference": extracted_data.get("reference", ""),
+                    "payment_reason": extracted_data.get("payment_reason", "")
+                }
+            except json.JSONDecodeError:
+                return Response({"error": "Failed to parse response from model"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+            return Response({"data":response_json}, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
