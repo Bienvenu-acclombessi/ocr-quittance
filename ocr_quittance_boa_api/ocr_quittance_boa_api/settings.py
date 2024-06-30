@@ -43,7 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ocr_quittance_v1'
+    'ocr_quittance_v1',
+        'corsheaders',
+
 ]
 
 MIDDLEWARE = [
@@ -54,9 +56,30 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        'corsheaders.middleware.CorsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'ocr_quittance_boa_api.urls'
+
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = True  # Autorise toutes les origines (à ajuster en production)
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = ['Content-Type', 'Authorization']
+CORS_ORIGIN_WHITELIST = (
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:8000",
+
+)
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:8000",
+]
+
 
 TEMPLATES = [
     {
