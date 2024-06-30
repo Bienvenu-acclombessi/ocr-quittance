@@ -31,6 +31,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '[::1]',
+    "https://ocr-quittance-api.vercel.app"
 ]
 
 
@@ -72,12 +73,13 @@ CORS_ORIGIN_WHITELIST = (
     "http://localhost:3000",
     "http://localhost:3001",
     "http://localhost:8000",
-
+    "https://ocr-quittance-api.vercel.app",
 )
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:3001",
     "http://localhost:8000",
+    "https://ocr-quittance-api.vercel.app",
 ]
 
 
