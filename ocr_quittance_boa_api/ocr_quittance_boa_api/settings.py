@@ -33,7 +33,10 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '[::1]',
 ]
-
+CORS_ALLOWED_ORIGINS = [
+    "https://ocr-quittance-api.vercel.app"
+    "http://localhost:3000",  # Example for a local frontend
+]
 
 # Application definition
 
@@ -44,12 +47,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'ocr_quittance_v1'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
