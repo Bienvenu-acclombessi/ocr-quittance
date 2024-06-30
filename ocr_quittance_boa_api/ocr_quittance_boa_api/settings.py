@@ -24,19 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-i8@w-%nt0=vxn+6)!i$d$pz^(0-ziyoe^obhaztj19e_wk!l&x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     'ocrquittanceapi1-f17rbnap.b4a.run',
-    'ocr-quittance-api.vercel.app'
     'localhost',
     '127.0.0.1',
     '[::1]',
 ]
-CORS_ALLOWED_ORIGINS = [
-    "https://ocr-quittance-api.vercel.app"
-    "http://localhost:3000",  # Example for a local frontend
-]
+
 
 # Application definition
 
@@ -47,14 +43,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
     'ocr_quittance_v1'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
