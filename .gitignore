@@ -152,5 +152,3 @@ htmlcov/
 coverage.xml
 
 # Docker files
-docker-compose.override.yml
-Dockerfile
