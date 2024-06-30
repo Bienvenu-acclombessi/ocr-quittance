@@ -24,10 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-i8@w-%nt0=vxn+6)!i$d$pz^(0-ziyoe^obhaztj19e_wk!l&x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
-    'ocrquittanceapi1-f17rbnap.b4a.run'
+    'ocrquittanceapi1-f17rbnap.b4a.run',
+    'https://ocr-quittance-api.vercel.app'
+    'localhost',
+    '127.0.0.1',
+    '[::1]',
 ]
 
 
