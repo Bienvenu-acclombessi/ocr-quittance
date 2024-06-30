@@ -11,7 +11,7 @@ WORKDIR /app
 COPY requirements.txt requirements.txt
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install  -r requirements.txt
 
 # Copy the current directory contents into the container at /app
 COPY . .
@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 8000
 
 # Run the migrations and then start the Django server
-CMD ["python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+CMD ["python","manage.py","runserver","0.0.0.0:8000"]
