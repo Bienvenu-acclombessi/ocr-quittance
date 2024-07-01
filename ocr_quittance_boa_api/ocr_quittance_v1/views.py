@@ -81,7 +81,7 @@ class ProcessPDFView(APIView):
                         6. Reference : Le numéro de référence sur la quittance.
                         7. Payment Reason : Le motif du paiement mentionné sur la quittance (situé après ou en dessous du nom de l'étudiant).
 
-                        Retournez les informations extraites au format JSON pur sans aucun formatage ou commentaire supplémentaire. Assurez-vous que la sortie soit un JSON valide pour éviter toute erreur de parsing.
+                        Retournez les informations extraites au format JSON pur sans aucun formatage ou commentaire supplémentaire. Assurez-vous que la sortie soit un JSON valide pour éviter toute erreur de parsing json.
 
                         Si les informations ne peuvent pas être trouvées dans l'image, veuillez retourner le JSON avec des attributs vides comme indiqué ci-dessous :
                         {
