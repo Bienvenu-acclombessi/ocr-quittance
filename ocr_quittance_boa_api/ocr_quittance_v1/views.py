@@ -79,7 +79,7 @@ class ProcessPDFView(APIView):
                         4. Currency : La devise dans laquelle le montant de la quittance est spécifié.
                         5. Date : La date mentionnée sur la quittance.
                         6. Reference : Le numéro de référence sur la quittance.
-                        7. Payment Reason : Le motif du paiement mentionné sur la quittance (situé après ou en dessous du nom de l'étudiant).
+                        7. Payment Reason : Le motif du paiement mentionné sur la quittance (situé après ou en dessous du nom de l'étudiant ou après un slash (/)).
 
                         Retournez les informations extraites au format JSON pur sans aucun formatage ou commentaire supplémentaire. Assurez-vous que la sortie soit un JSON valide pour éviter toute erreur de parsing json.
 
