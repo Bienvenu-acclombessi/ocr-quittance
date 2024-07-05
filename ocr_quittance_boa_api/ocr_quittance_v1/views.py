@@ -71,7 +71,7 @@ class ProcessPDFView(APIView):
                         }
                     """
             prompt="""Veuillez analyser l'image de la quittance jointe et extraire les informations suivantes :
-                        1. Amount : Le montant majoré de l'opération, excluant les frais de timbre.Il faut le  convertir en réel pour l'utilisation facile, c'est à dire sans , ou . .
+                        1. Amount : Le montant majoré de l'opération, excluant les frais de timbre.Il precede "majore de". Il faut le  convertir en réel pour l'utilisation facile, c'est à dire sans , ou . .
                         2. Student Name : Le nom de l'étudiant associé à la quittance.
                         3. Stamp Fees : Les frais de timbre inclus dans la quittance. Ils sont toujours situés après le montant et ne peuvent jamais être égaux au montant. Laissez ce champ vide si les frais de timbre ne sont pas mentionnés.
                         4. Currency : La devise dans laquelle le montant de la quittance est spécifié.
