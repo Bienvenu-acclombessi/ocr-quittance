@@ -33,8 +33,6 @@ class ProcessPDFView(APIView):
                         page = doc.load_page(page_num)
                         pix = page.get_pixmap()
                         img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-                        if img.width > img.height:
-                            img = ImageOps.exif_transpose(img.rotate(90, expand=True))
                         images.append(img)
 
                     # Supposons que nous traitons uniquement la première page pour cet exemple
