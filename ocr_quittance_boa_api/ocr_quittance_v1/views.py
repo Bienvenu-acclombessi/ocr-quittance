@@ -17,16 +17,51 @@ from drf_yasg import openapi
 genai.configure(api_key=settings.GOOGLE_GENAI_API_KEY)
 class ProcessPDFView(APIView):
     @swagger_auto_schema(
-        request_body=PDFUploadSerializer,
-        responses={200: """{
-                            amount: "",
-                            student_name: "",
-                            stamp_fees: "",
-                            currency: "",
-                            date: "",
-                            reference: "",
-                            payment_reason: ""
-                        }""", 400: 'Bad Request'}
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'file': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_BINARY, description='PDF file to process'),
+            },
+            required=['file'],
+        ),
+        responses={
+            200: openapi.Response(
+                description='File processed successfully',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'data': openapi.Schema(
+                            type=openapi.TYPE_OBJECT,
+                            properties={
+                                'amount': openapi.Schema(type=openapi.TYPE_STRING, description='Amount'),
+                                'student_name': openapi.Schema(type=openapi.TYPE_STRING, description='Student name'),
+                                'stamp_fees': openapi.Schema(type=openapi.TYPE_STRING, description='Stamp fees'),
+                                'currency': openapi.Schema(type=openapi.TYPE_STRING, description='Currency'),
+                                'date': openapi.Schema(type=openapi.TYPE_STRING, description='Date'),
+                                'reference': openapi.Schema(type=openapi.TYPE_STRING, description='Reference'),
+                                'payment_reason': openapi.Schema(type=openapi.TYPE_STRING, description='Payment reason'),
+                            },
+                        ),
+                    },
+                ),
+            ),
+            400: openapi.Response(
+                description='Bad Request',
+                examples={
+                    'application/json': {
+                        'file': ['This field is required.'],
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description='Internal Server Error',
+                examples={
+                    'application/json': {
+                        'error': 'Failed to parse response from model',
+                    }
+                }
+            ),
+        }
     )
     def post(self, request, *args, **kwargs):
         serializer = PDFUploadSerializer(data=request.data)
