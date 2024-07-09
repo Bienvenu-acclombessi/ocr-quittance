@@ -11,10 +11,23 @@ from rest_framework import status
 from .serializers import PDFUploadSerializer
 import google.generativeai as genai
 from django.core.files.uploadedfile import InMemoryUploadedFile
-
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 genai.configure(api_key=settings.GOOGLE_GENAI_API_KEY)
 class ProcessPDFView(APIView):
+    @swagger_auto_schema(
+        request_body=PDFUploadSerializer,
+        responses={200: """{
+                            amount: "",
+                            student_name: "",
+                            stamp_fees: "",
+                            currency: "",
+                            date: "",
+                            reference: "",
+                            payment_reason: ""
+                        }""", 400: 'Bad Request'}
+    )
     def post(self, request, *args, **kwargs):
         serializer = PDFUploadSerializer(data=request.data)
         
