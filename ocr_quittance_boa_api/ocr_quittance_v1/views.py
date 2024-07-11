@@ -11,10 +11,58 @@ from rest_framework import status
 from .serializers import PDFUploadSerializer
 import google.generativeai as genai
 from django.core.files.uploadedfile import InMemoryUploadedFile
-
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 genai.configure(api_key=settings.GOOGLE_GENAI_API_KEY)
 class ProcessPDFView(APIView):
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'file': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_BINARY, description='PDF file to process'),
+            },
+            required=['file'],
+        ),
+        responses={
+            200: openapi.Response(
+                description='File processed successfully',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'data': openapi.Schema(
+                            type=openapi.TYPE_OBJECT,
+                            properties={
+                                'amount': openapi.Schema(type=openapi.TYPE_STRING, description='Amount'),
+                                'student_name': openapi.Schema(type=openapi.TYPE_STRING, description='Student name'),
+                                'stamp_fees': openapi.Schema(type=openapi.TYPE_STRING, description='Stamp fees'),
+                                'currency': openapi.Schema(type=openapi.TYPE_STRING, description='Currency'),
+                                'date': openapi.Schema(type=openapi.TYPE_STRING, description='Date'),
+                                'reference': openapi.Schema(type=openapi.TYPE_STRING, description='Reference'),
+                                'payment_reason': openapi.Schema(type=openapi.TYPE_STRING, description='Payment reason'),
+                            },
+                        ),
+                    },
+                ),
+            ),
+            400: openapi.Response(
+                description='Bad Request',
+                examples={
+                    'application/json': {
+                        'file': ['This field is required.'],
+                    }
+                }
+            ),
+            500: openapi.Response(
+                description='Internal Server Error',
+                examples={
+                    'application/json': {
+                        'error': 'Failed to parse response from model',
+                    }
+                }
+            ),
+        }
+    )
     def post(self, request, *args, **kwargs):
         serializer = PDFUploadSerializer(data=request.data)
         
@@ -33,8 +81,6 @@ class ProcessPDFView(APIView):
                         page = doc.load_page(page_num)
                         pix = page.get_pixmap()
                         img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-                        if img.width > img.height:
-                            img = ImageOps.exif_transpose(img.rotate(90, expand=True))
                         images.append(img)
 
                     # Supposons que nous traitons uniquement la première page pour cet exemple
@@ -73,7 +119,7 @@ class ProcessPDFView(APIView):
             #             }
             #         """
             prompt="""Veuillez analyser l'image de la quittance jointe et extraire les informations suivantes :
-                        1. Amount : Le montant majoré de l'opération, excluant les frais de timbre.Il faut le  convertir en réel pour l'utilisation facile, c'est à dire sans , ou . .
+                        1. Amount : Le montant majoré( precède la phrase 'majore de') de l'opération, excluant les frais de timbre.Il faut le  convertir en réel pour l'utilisation facile, c'est à dire sans , ou . .
                         2. Student Name : Le nom de l'étudiant associé à la quittance.
                         3. Stamp Fees : Les frais de timbre inclus dans la quittance. Ils sont toujours situés après le montant et ne peuvent jamais être égaux au montant. Laissez ce champ vide si les frais de timbre ne sont pas mentionnés.
                         4. Currency : La devise dans laquelle le montant de la quittance est spécifié.
