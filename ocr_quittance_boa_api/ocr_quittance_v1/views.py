@@ -96,28 +96,7 @@ class ProcessPDFView(APIView):
             # Supposons que nous traitons uniquement la première page pour cet exemple
             
             model = genai.GenerativeModel('gemini-1.5-flash')
-            # prompt = """Please analyze the attached image of an invoice and extract the following information:
-            #             1. Amount: The initial amount of the operation, excluding the stamp fees.
-            #             2. Student Name: The name of the student associated with the invoice.
-            #             3. Stamp Fees: The stamp fees included in the invoice. it's always located after the amount and can never equal to amount. Set it to empty string if The stamp fees is not found.
-            #             4. Currency: The currency in which the invoice amount is specified.
-            #             5. Date: The date mentioned on the invoice.
-            #             6. Reference: The reference number on the invoice.
-            #             7. Payment Reason: The reason for the payment mentioned on the invoice (located after or below the student's name).
-
-            #             Return the extracted information in pure JSON format without any additional formatting or comments. Ensure the output is valid JSON to avoid any parsing errors.
-
-            #             If the information cannot be found in the image, please return the JSON with empty attributes as shown below:
-            #             {
-            #                 "amount": "",
-            #                 "student_name": "",
-            #                 "stamp_fees": "",
-            #                 "currency": "",
-            #                 "date": "",
-            #                 "reference": "",
-            #                 "payment_reason": ""
-            #             }
-            #         """
+           
             prompt="""Veuillez analyser l'image de la quittance jointe et extraire les informations suivantes :
                         1. Amount : Le montant majoré( precède la phrase 'majore de') de l'opération, excluant les frais de timbre.Il faut le  convertir en réel pour l'utilisation facile, c'est à dire sans , ou . .
                         2. Student Name : Le nom de l'étudiant associé à la quittance.
@@ -126,7 +105,7 @@ class ProcessPDFView(APIView):
                         5. Date : La date mentionnée sur la quittance.
                         6. Reference : Le numéro de référence sur la quittance.
                         7. Payment Reason : Le motif du paiement mentionné sur la quittance (situé après ou en dessous du nom de l'étudiant ou après un slash (/)).
-                        8. Account Number : Le numéro du compte qui a été crédité
+                        8. Account Number : Le numéro du compte qui a été crédité.
 
                         Retournez les informations extraites au format JSON pur sans aucun formatage ou commentaire supplémentaire. Assurez-vous que la sortie soit un JSON valide pour éviter toute erreur de parsing json.
 

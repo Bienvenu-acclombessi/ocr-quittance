@@ -31,7 +31,8 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '[::1]',
-    "https://ocr-quittance-api.vercel.app"
+    "https://ocr-quittance-api.vercel.app",
+    "192.168.0.124",
 ]
 
 
@@ -44,10 +45,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-     'rest_framework',
+    'rest_framework',
     'drf_yasg',
     'ocr_quittance_v1',
-        'corsheaders',
+    'corsheaders',
 
 ]
 
@@ -77,6 +78,7 @@ CORS_ORIGIN_WHITELIST = (
     "http://localhost:8000",
     "https://ocr-quittance-api.vercel.app",
 )
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:3001",
