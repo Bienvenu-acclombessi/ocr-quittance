@@ -13,6 +13,9 @@ import google.generativeai as genai
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from google.api_core.exceptions import ResourceExhausted  # Assurez-vous d'avoir installé le package google-api-core
+import random
+
 
 genai.configure(api_key=settings.GOOGLE_GENAI_API_KEY)
 class ProcessPDFView(APIView):
@@ -96,6 +99,7 @@ class ProcessPDFView(APIView):
             # Supposons que nous traitons uniquement la première page pour cet exemple
             
             model = genai.GenerativeModel('gemini-1.5-flash')
+            
            
             prompt="""Veuillez analyser l'image de la quittance jointe et extraire les informations suivantes :
                         1. Amount : Le montant majoré( precède la phrase 'majore de') de l'opération, excluant les frais de timbre.Il faut le  convertir en réel pour l'utilisation facile, c'est à dire sans , ou . .
@@ -121,8 +125,27 @@ class ProcessPDFView(APIView):
                             "account_number": ""
                         }
                         """
-                        
-            response = model.generate_content([prompt, img])
+            response = {}
+            
+            
+            has_resource_exhausted_error = True
+            
+    
+    
+            i=1
+            while has_resource_exhausted_error:
+                i=i+1
+                try:
+                    has_resource_exhausted_error = False
+                    response = model.generate_content([prompt, img])
+                
+                except ResourceExhausted as e:
+                    genai.configure(api_key=random.choice(settings.GOOGLE_GENAI_API_KEYS))
+                    has_resource_exhausted_error = True
+                    if i==30: raise e
+                    
+                             
+
 
             try:
                 cleaned_response = re.sub(r'```json|```', '', response.text).strip()
